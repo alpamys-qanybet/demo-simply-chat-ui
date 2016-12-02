@@ -40,6 +40,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 	$scope.preAdd = ->
 		init()
 		$mode.change('add')
+		return
 
 	getAvailableUsers = ->
 		if not $scope.model.room.edit.id
@@ -64,14 +65,17 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 		if $scope.users.length > 0
 			$scope.model.select.user = $scope.users[0].id
 
+		return
+
 	
 	fetchRoomUsers = (id)->
 		$rootScope.loading = true
 		$api.room.users.list id, (data)->
 			$rootScope.loading = false
 			$scope.model.room.edit.users = data
-
 	# 		getAvailableUsers()
+			return
+		return
 
 	$scope.add = ->
 		plain =
@@ -105,6 +109,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 		getAvailableUsers()
 		$mode.change 'view'
 		# fetchRoomUsers room.id
+		return
 
 	$scope.addUser = ->
 		id = $scope.model.room.edit.id
@@ -159,8 +164,6 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 		$scope.Messages.response['queue']
 	,
 		(newvalue,oldvalue)->
-			console.log newvalue.event
-
 			if not newvalue
 				return
 

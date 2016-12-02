@@ -26,7 +26,7 @@
       };
       $scope.preAdd = function() {
         init();
-        return $mode.change('add');
+        $mode.change('add');
       };
       getAvailableUsers = function() {
         var accessToChatRoomIndex, index, user, _i, _len, _ref;
@@ -50,14 +50,14 @@
           }
         }
         if ($scope.users.length > 0) {
-          return $scope.model.select.user = $scope.users[0].id;
+          $scope.model.select.user = $scope.users[0].id;
         }
       };
       fetchRoomUsers = function(id) {
         $rootScope.loading = true;
-        return $api.room.users.list(id, function(data) {
+        $api.room.users.list(id, function(data) {
           $rootScope.loading = false;
-          return $scope.model.room.edit.users = data;
+          $scope.model.room.edit.users = data;
         });
       };
       $scope.add = function() {
@@ -86,7 +86,7 @@
       $scope.select = function(room) {
         $scope.model.room.edit = room;
         getAvailableUsers();
-        return $mode.change('view');
+        $mode.change('view');
       };
       $scope.addUser = function() {
         var id, plain;
@@ -134,7 +134,6 @@
         return $scope.Messages.response['queue'];
       }, function(newvalue, oldvalue) {
         var index, indexInsideRoom, indexRoom, msg, room, roomInfo, rooms, user, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
-        console.log(newvalue.event);
         if (!newvalue) {
           return;
         }
