@@ -1,0 +1,13 @@
+<div class="container">
+	<div ng-if="$mode.current() == 'list'">
+		<div>
+			<div ng-repeat="room in rooms">
+				<a href="#/room/view/{{room.id}}" ng-click="select(room)">{{room.name}}</a> {{room.messages.length}} messages, {{room.users.length}} participants
+			</div>
+		</div>
+
+		<a href="#/room/add" ng-if="$security.hasRole('ADMIN')" ng-click="preAdd()" class="btn btn-default">add</a>
+	</div>
+
+	<div ui-view></div>
+</div>

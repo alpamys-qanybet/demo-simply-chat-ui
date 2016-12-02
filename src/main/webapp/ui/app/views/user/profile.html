@@ -1,0 +1,51 @@
+<div class="container" style="width:100%;">
+	<div ng-if="$mode.current() == 'view'">
+		<div>{{'user.login' | i18next}}: {{user.login}}</div>
+		<div>{{'user.name' | i18next}}: {{user.name}}</div>
+
+		<a href="#/users" ng-click="back()" class="btn btn-default">{{'button.back' | i18next}}</a>
+		<a href="#/user/profile/{{$cookies.get('userId')}}/password-change" 
+			ng-if="current.id == $cookies.get('userId')" 
+			ng-click="$mode.change('password-change')"
+			class="btn btn-primary">Change password</a>
+		<button ng-if="$security.hasRole('ADMIN')" ng-click="resetPassword()" class="btn btn-success">Reset Password</button>
+		<button ng-if="(current.id == $cookies.get('userId')) || $security.hasRole('ADMIN')" 
+			ng-click="$mode.change('edit')"
+			class="btn btn-info">{{'button.edit' | i18next}}</button>
+		<button ng-if="$security.hasRole('ADMIN')" ng-click="delete()"
+			class="btn btn-danger">{{'button.delete' | i18next}}</button>
+	</div>
+
+	<div ng-if="$mode.current() == 'edit'">
+		<form name="form_edit" class="form-ctrl">
+			<input-text name="name"
+				validator="form_edit.name"
+				model="model.user.name"
+				label="user.name"
+				min="3"
+				max="35">
+			</input-text>
+
+			<div ng-if="$security.hasRole('ADMIN')">
+				{{'role.user' | i18next}}:
+				<ul>
+					<li ng-repeat="role in model.user.roles">
+						<a href ng-click="removeRole(role)">{{role}}</a>
+					</li>
+				</ul>
+
+				{{'role.list' | i18next}}:
+				<ul>
+					<li ng-repeat="role in roles">
+						<a href ng-click="addRole(role)">{{role}}</a>
+					</li>
+				</ul>
+			</div>
+
+			<button ng-click="cancelEdit()" class="btn btn-default">{{'button.cancel' | i18next}}</button>
+			<button ng-click="edit(model.user);" class="btn btn-info" ng-disabled="form_edit.$invalid">{{'button.edit' | i18next}}</button>
+		</form>
+	</div>
+
+	<div ui-view></div>
+</div>

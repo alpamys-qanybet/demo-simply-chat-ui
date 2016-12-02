@@ -1,0 +1,84 @@
+<form name="form_register" class="form-ctrl" ng-if="$mode.current() == 'register'">
+	<div class="row">
+		<div class="col-sm-4">
+			<div class="form-group" ng-class="{'has-error': (form_register.login.$touched || form_register.login.$dirty) && form_register.login.$invalid}">
+				<label class="control-label" for="login">Login</label>
+				<input type='text' 
+					class="form-control"
+					ng-model="model.login" 
+					id="login"
+					placeholder="Login"
+					name="login" 
+					ng-minlength="3" 
+					ng-maxlength="9"
+					aria-describedby="block"
+					required/>
+
+
+				<span id="block" class="help-block"
+					ng-show="(form_register.login.$touched || form_register.login.$dirty) && form_register.login.$error.required">
+					{{'validation.input.required'}}
+				</span>
+				
+				<span id="block" class="help-block"
+					ng-show="(form_register.login.$touched || form_register.login.$dirty) && form_register.login.$error.minlength">
+					{{'validation.input.minlength'}}
+				</span>
+
+				<span id="block" class="help-block"
+					ng-show="(form_register.login.$touched || form_register.login.$dirty) && form_register.login.$error.maxlength">
+					{{'validation.input.maxlength'}}
+				</span>
+				<span id="block" class="help-block"
+					ng-show="loginNotAvailable">Login not available
+				</span>
+			</div>
+		</div>
+
+		<div class="col-sm-4">
+			<div class="form-group" ng-class="{'has-error': (form_register.name.$touched || form_register.name.$dirty) && form_register.name.$invalid}">
+				<label class="control-label" for="name">Name</label>
+				<input type='text' 
+					class="form-control"
+					ng-model="model.name" 
+					id="name"
+					placeholder="Name"
+					name="name" 
+					ng-minlength="3" 
+					ng-maxlength="9"
+					aria-describedby="block"
+					required/>
+
+				<span id="block" class="help-block"
+					ng-show="(form_register.name.$touched || form_register.name.$dirty) && form_register.name.$error.required">
+					{{'validation.input.required'}}
+				</span>
+				
+				<span id="block" class="help-block"
+					ng-show="(form_register.name.$touched || form_register.name.$dirty) && form_register.name.$error.minlength">
+					{{'validation.input.minlength'}}
+				</span>
+
+				<span id="block" class="help-block"
+					ng-show="(form_register.name.$touched || form_register.name.$dirty) && form_register.name.$error.maxlength">
+					{{'validation.input.maxlength'}}
+				</span>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<a ng-click="$auth.authenticate()" class="btn btn-default">Signin</a>
+		<button class="btn btn-info" ng-click="register()" ng-disabled="form_register.$invalid">Register</button>
+	</div>
+</form>
+
+<div ng-if="$mode.current() == 'signin'">
+	<div class="row">
+		Your login and password are {{model.login}}, {{model.password}}
+	</div>
+
+	<div class="row">
+		<a ng-click="$auth.authenticate()" class="btn btn-default">Signin</a>
+	</div>
+</div>

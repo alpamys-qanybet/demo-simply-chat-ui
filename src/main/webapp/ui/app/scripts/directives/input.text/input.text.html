@@ -1,0 +1,28 @@
+<div class="form-group" ng-class="{'has-error': (validator.$touched || validator.$dirty) && validator.$invalid}">
+	<label class="control-label" for="name">{{label}}</label>
+	<input type='text' 
+		class="form-control"
+		ng-model="model" 
+		id="{{name}}"
+		placeholder="{{label}}"
+		name="{{name}}" 
+		ng-minlength="min" 
+		ng-maxlength="max"
+		aria-describedby="block"
+		required/>
+
+	<span id="block" class="help-block"
+		ng-show="(validator.$touched || validator.$dirty) && validator.$error.required">
+		Required
+	</span>
+	
+	<span id="block" class="help-block"
+		ng-show="(validator.$touched || validator.$dirty) && validator.$error.minlength">
+		Too short
+	</span>
+
+	<span id="block" class="help-block"
+		ng-show="(validator.$touched || validator.$dirty) && validator.$error.maxlength">
+		Exceeded character
+	</span>
+</div>

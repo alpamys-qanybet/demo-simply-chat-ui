@@ -1,0 +1,82 @@
+<div ng-if="$mode.current() == 'view'">
+
+	<form name="form_edit">
+	<div class="row" ng-if="$security.hasRole('ADMIN')">
+		<div class="col-sm-4">
+			<a href="#/room" class="btn btn-default" ng-click="$mode.change('list')">back</a>
+			<a href="#/room/view/{{model.room.edit.id}}/users" class="btn btn-info">users</a>
+		</div>
+
+		<div class="col-sm-4" ng-class="{'has-error': (form_edit.name.$touched || form_edit.name.$dirty) && form_edit.name.$invalid}">
+				<input type='text' 
+					ng-model="model.room.edit.name" 
+					id="name"
+					placeholder="Room name"
+					name="name" 
+					ng-minlength="3" 
+					ng-maxlength="25"
+					style="width: 300px;"
+					aria-describedby="block"
+					required/>
+				<span id="block" class="help-block"
+					ng-show="(form_edit.name.$touched || form_edit.name.$dirty) && form_edit.name.$error.required">
+					Required
+				</span>
+				
+				<span id="block" class="help-block"
+					ng-show="(form_edit.name.$touched || form_edit.name.$dirty) && form_edit.name.$error.minlength">
+					Too short
+				</span>
+
+				<span id="block" class="help-block"
+					ng-show="(form_edit.name.$touched || form_edit.name.$dirty) && form_edit.name.$error.maxlength">
+					Exceeded character
+				</span>
+			</div>
+
+		<div class="col-sm-4">
+			<button class="btn btn-success" ng-click="edit()" ng-disabled="form_edit.$invalid">edit</button>
+			<button class="btn btn-danger"  ng-click="removeRoom()">delete</button>
+		</div>
+	</div>
+	</form>
+	
+	<div class="row" ng-if="$security.hasRole('GUEST')">
+		<div class="col-sm-4">
+			<a href="#/room" class="btn btn-default" ng-click="$mode.change('list')">back</a>
+		</div>
+		<div class="col-sm-4">
+			<span>{{model.room.edit.name}}</span>
+		</div>
+		<div class="col-sm-4">
+			<a href="#/room/view/{{model.room.edit.id}}/users" class="btn btn-info">users</a>
+		</div>
+	</div>
+	
+	<div ui-view></div>
+
+	<div ng-show="model.room.edit.available">
+		<p ng-repeat="msg in model.room.edit.messages" ng-class="{'admin-message': msg.user.admin}">
+			{{msg.user.name}}: {{msg.content}}
+		</p>
+
+		
+		<form name="form_msg" class="form-ctrl">
+			<div class="row">
+				<div class="col-sm-4">
+					<input-text
+						name="name"
+						validator="form_msg.name"
+						model="model.msg"
+						label="Input message"
+						min="2"
+						max="50">
+					</input-text>
+					<button class="btn btn-success" 
+						ng-click="sendMessage()" 
+						ng-disabled="form_msg.$invalid">Send</button>
+				</div>
+			</div>
+		</form>
+	</div>
+</div>

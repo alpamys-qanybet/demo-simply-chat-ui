@@ -1,0 +1,8 @@
+<div class="btn-group" data-toggle="buttons">	
+	<button class="btn btn-default" 
+		ng-repeat="item in list track by $index"
+		ng-class="{'active': model == item.value}" 
+		ng-click="select(item)">
+			{{item.label | i18next}}
+	</button>
+</div>

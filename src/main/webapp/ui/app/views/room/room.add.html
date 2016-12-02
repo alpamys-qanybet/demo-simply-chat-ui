@@ -1,0 +1,14 @@
+<div ng-if="$mode.current() == 'add'">
+	<form name="form_add" class="form-ctrl">
+		<input-text name="name"
+			validator="form_add.name"
+			model="model.room.add.name"
+			label="Room name"
+			min="3"
+			max="25">
+		</input-text>
+
+		<a href="#/room" class="btn btn-default" ng-click="$mode.change('list')">cancel</a>
+		<button type="button" class="btn btn-info" ng-click="add()" ng-disabled="form_add.$invalid">add</button>
+	</form>
+</div>
