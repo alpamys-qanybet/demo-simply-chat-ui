@@ -1,7 +1,6 @@
 angular.module('ibnsina').service '$api', ['$rootScope', 'Restangular', ($rootScope, Restangular)->
 	
 	Restangular.setErrorInterceptor (response, deferred, responseHandler)->
-		# console.log response
 		if response.status == 200
 			return false # error handled
 

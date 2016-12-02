@@ -24,15 +24,6 @@ angular.module('ibnsina', ['ui.router', 'restangular', 'ngCookies', 'ngSanitize'
 	}])
 	.config(['$stateProvider', function($stateProvider) {
 		$stateProvider
-        .state('users', {
-			url: '/users',
-			templateUrl: 'views/user/user.list.html',
-			controller: 'UsersCtrl'
-		})
-		.state('users.add', {
-            url: '/add',
-            templateUrl: 'views/user/user.add.html'
-        })
         .state('register', {
             url: '/register',
             templateUrl: 'views/register.html',

@@ -170,7 +170,6 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 			if newvalue.event == 'LAUNCH_INFO'
 				init()
 				$scope.rooms = []
-				console.log newvalue
 			
 				$scope.allUsers = newvalue.users
 

@@ -140,7 +140,6 @@
         if (newvalue.event === 'LAUNCH_INFO') {
           init();
           $scope.rooms = [];
-          console.log(newvalue);
           $scope.allUsers = newvalue.users;
           rooms = angular.copy(newvalue.rooms);
           for (_i = 0, _len = rooms.length; _i < _len; _i++) {
