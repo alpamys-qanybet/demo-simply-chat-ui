@@ -16,12 +16,12 @@
           login: $scope.model.login,
           name: $scope.model.name
         };
-        return $api.openapi.register(plain, function(data) {
+        $api.openapi.register(plain, function(data) {
           if (!data.field.value) {
-            return $scope.loginNotAvailable = true;
+            $scope.loginNotAvailable = true;
           } else {
             $scope.model.password = data.field.value;
-            return $mode.change('signin');
+            $mode.change('signin');
           }
         });
       };

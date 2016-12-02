@@ -19,5 +19,7 @@ angular.module('ibnsina').controller 'RegisterCtrl', ['$scope', '$rootScope', '$
 			else
 				$scope.model.password = data.field.value
 				$mode.change 'signin'
+			return
+		return
 	return
 ]
