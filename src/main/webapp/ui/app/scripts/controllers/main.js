@@ -6,9 +6,9 @@
       $rootScope.covering = true;
       $rootScope.domain = domainURL;
       $auth.authorized(function() {
-        return $auth.authenticate();
+        $auth.authenticate();
       }, function() {
-        return $state.transitionTo('register');
+        $state.transitionTo('register');
       });
       $scope.navs = [
         {

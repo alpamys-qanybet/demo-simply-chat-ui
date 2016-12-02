@@ -5,8 +5,10 @@ angular.module('ibnsina').controller 'MainCtrl', ['$scope', '$rootScope', '$auth
 	# $auth.authenticate()
 	$auth.authorized ->
 		$auth.authenticate()
+		return
 	, ->
 		$state.transitionTo 'register'
+		return
 
 	$scope.navs = [
 		name: 'users'
