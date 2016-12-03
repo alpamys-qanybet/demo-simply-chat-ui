@@ -1,8 +1,8 @@
 // var domainHost = 'alpamys-samsung:8080';
-var domainHost = 'localhost:8080';
-var domainURL = 'http://'+domainHost;
-//var domainURL = window.location.origin;
-//var domainHost = domainURL.substr(7);
+// var domainHost = 'localhost:8080';
+// var domainURL = 'http://'+domainHost;
+var domainURL = window.location.origin;
+var domainHost = domainURL.substr(7);
 
 angular.module('ibnsina', ['ui.router', 'restangular', 'ngCookies', 'ngSanitize', 'cgNotify', 'ngWebSocket'])
 	.config(['RestangularProvider', function(RestangularProvider) {

@@ -34,6 +34,8 @@ angular.module('ibnsina').factory('MessagesMonitoring', function($websocket) {
         console.log('connection open');
       });
 
+
+
       function pingURL() {
         jQuery.ajax({ type : "GET",
           url : domainURL+'/api/rest/displayjsonp',
@@ -64,6 +66,9 @@ angular.module('ibnsina').factory('MessagesMonitoring', function($websocket) {
 
       return {
         response: response,
+        close: function() {
+          ws.close();
+        },
         status: function() {
           return ws.readyState;
         },

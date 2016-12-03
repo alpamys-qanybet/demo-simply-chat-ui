@@ -1,5 +1,4 @@
 <div ng-if="$mode.current() == 'view'">
-
 	<form name="form_edit">
 	<div class="row" ng-if="$security.hasRole('ADMIN')">
 		<div class="col-sm-4">
@@ -35,6 +34,8 @@
 			</div>
 
 		<div class="col-sm-4">
+			<button ng-show="!map.hasRoomAccess['ra'+model.room.edit.id]" class="btn btn-success" ng-click="addUser(thisUserId)">Join group</button>
+			<button ng-show="map.hasRoomAccess['ra'+model.room.edit.id]" class="btn btn-danger" ng-click="removeUser(thisUserId)">Leave group</button>
 			<button class="btn btn-success" ng-click="edit()" ng-disabled="form_edit.$invalid">edit</button>
 			<button class="btn btn-danger"  ng-click="removeRoom()">delete</button>
 		</div>
@@ -49,16 +50,26 @@
 			<span>{{model.room.edit.name}}</span>
 		</div>
 		<div class="col-sm-4">
-			<a href="#/room/view/{{model.room.edit.id}}/users" class="btn btn-info">users</a>
+			<!-- <a href="#/room/view/{{model.room.edit.id}}/users" class="btn btn-info">users</a> -->
+			<button ng-show="!map.hasRoomAccess['ra'+model.room.edit.id]" class="btn btn-success" ng-click="addUser(thisUserId)">Join group</button>
+			<button ng-show="map.hasRoomAccess['ra'+model.room.edit.id]" class="btn btn-danger" ng-click="removeUser(thisUserId)">Leave group</button>
 		</div>
 	</div>
 	
 	<div ui-view></div>
 
 	<div ng-show="model.room.edit.available">
-		<p ng-repeat="msg in model.room.edit.messages" ng-class="{'admin-message': msg.user.admin}">
-			{{msg.user.name}}: {{msg.content}}
-		</p>
+		<div class="row" ng-repeat="msg in model.room.edit.messages">
+			<div class="col-sm-5">
+				<div class="col-sm-3">
+					<span ng-show="map.user['u'+msg.user.id].online"><span class="circle-online">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+					<span ng-show="!map.user['u'+msg.user.id].online"><span class="circle-offline">&nbsp;&nbsp;&nbsp;&nbsp;</span></span> {{msg.user.name}}:
+				</div>
+				<div class="col-sm-9">
+					<p ng-class="{'admin-message': msg.user.admin}">{{msg.content}}</p>
+				</div>
+			</div>
+		</div>
 
 		
 		<form name="form_msg" class="form-ctrl">

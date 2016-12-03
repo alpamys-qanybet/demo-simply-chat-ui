@@ -1,8 +1,20 @@
 <div class="container">
 	<div ng-if="$mode.current() == 'list'">
+		<p ng-repeat="u in allUsers">
+			<span ng-show="map.user['u'+u.id].online"><span class="circle-online">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+			<span ng-show="!map.user['u'+u.id].online"><span class="circle-offline">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
+			{{u.name}} 
+		</p>
 		<div>
-			<div ng-repeat="room in rooms">
-				<a href="#/room/view/{{room.id}}" ng-click="select(room)">{{room.name}}</a> {{room.messages.length}} messages, {{room.users.length}} participants
+			<div class="row" ng-repeat="room in rooms">
+				<div class="col-sm-4">
+					<a href="#/room/view/{{room.id}}" ng-click="select(room)">{{room.name}}</a> {{room.messages.length}} messages, {{room.users.length}} participants
+				</div>
+				<div class="col-sm-4">
+					<button ng-show="!map.hasRoomAccess['ra'+{{room.id}}]" class="btn btn-success" ng-click="addUser(thisUserId, room.id)">Join group</button>
+					<button ng-show="map.hasRoomAccess['ra'+{{room.id}}]" class="btn btn-danger" ng-click="removeUser(thisUserId, room.id)">Leave group</button>
+				</div>
+				
 			</div>
 		</div>
 

@@ -3,8 +3,18 @@
 
   angular.module('ibnsina').controller('RoomCtrl', [
     '$scope', '$state', '$rootScope', '$api', 'MessagesMonitoring', '$security', '$mode', '$cookies', function($scope, $state, $rootScope, $api, Messages, $security, $mode, $cookies) {
-      var fetchRoomUsers, getAvailableUsers, init, pureModel;
+      var fetchRoomUsers, getAvailableUsers, init, prefix, pureModel;
       $rootScope.current = 'room';
+      $scope.thisUserId = Number($cookies.get('userId'));
+      $scope.allUsers = [];
+      prefix = {
+        user: 'u',
+        hasRoomAccess: 'ra'
+      };
+      $scope.map = {
+        user: [],
+        hasRoomAccess: []
+      };
       pureModel = {
         room: {
           add: {
@@ -29,7 +39,7 @@
         $mode.change('add');
       };
       getAvailableUsers = function() {
-        var accessToChatRoomIndex, index, user, _i, _len, _ref;
+        var accessToChatRoomIndex, index, indexInUsers, user, _i, _len, _ref;
         if (!$scope.model.room.edit.id) {
           return;
         }
@@ -37,7 +47,7 @@
         $scope.model.room.edit.available = false;
         accessToChatRoomIndex = $scope.model.room.edit.users.map(function(e) {
           return e.id;
-        }).indexOf(Number($cookies.get('userId')));
+        }).indexOf($scope.thisUserId);
         $scope.model.room.edit.available = accessToChatRoomIndex > -1;
         _ref = $scope.allUsers;
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
@@ -45,7 +55,10 @@
           index = $scope.model.room.edit.users.map(function(e) {
             return e.id;
           }).indexOf(user.id);
-          if (index === -1) {
+          indexInUsers = $scope.users.map(function(e) {
+            return e.id;
+          }).indexOf(user.id);
+          if (index === -1 && indexInUsers === -1) {
             $scope.users.push(user);
           }
         }
@@ -88,11 +101,16 @@
         getAvailableUsers();
         $mode.change('view');
       };
-      $scope.addUser = function() {
+      $scope.addUser = function(userId, roomId) {
         var id, plain;
-        id = $scope.model.room.edit.id;
+        id = null;
+        if (roomId) {
+          id = roomId;
+        } else {
+          id = $scope.model.room.edit.id;
+        }
         plain = {
-          id: $scope.model.select.user
+          id: userId
         };
         $rootScope.loading = true;
         $api.room.users.create(id, plain, function(data) {
@@ -100,9 +118,14 @@
           fetchRoomUsers(id);
         });
       };
-      $scope.removeUser = function(userId) {
+      $scope.removeUser = function(userId, roomId) {
         var id;
-        id = $scope.model.room.edit.id;
+        id = null;
+        if (roomId) {
+          id = roomId;
+        } else {
+          id = $scope.model.room.edit.id;
+        }
         $rootScope.loading = true;
         $api.room.users["delete"](id, userId, function(data) {
           $rootScope.loading = false;
@@ -133,22 +156,29 @@
       $scope.$watch(function() {
         return $scope.Messages.response['queue'];
       }, function(newvalue, oldvalue) {
-        var index, indexInsideRoom, indexRoom, msg, room, roomInfo, rooms, user, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
-        if (!newvalue) {
-          return;
-        }
+        var accessToChatRoomIndex, index, indexInsideRoom, indexRoom, login, logins, msg, online, room, roomInfo, rooms, u, user, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
         if (newvalue.event === 'LAUNCH_INFO') {
           init();
           $scope.rooms = [];
           $scope.allUsers = newvalue.users;
+          _ref = $scope.allUsers;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            u = _ref[_i];
+            $scope.map.user[prefix.user + u.id] = angular.copy(u);
+            $scope.map.user[prefix.user + u.id].online = false;
+          }
           rooms = angular.copy(newvalue.rooms);
-          for (_i = 0, _len = rooms.length; _i < _len; _i++) {
-            roomInfo = rooms[_i];
+          for (_j = 0, _len1 = rooms.length; _j < _len1; _j++) {
+            roomInfo = rooms[_j];
             roomInfo.room.users = roomInfo.users;
+            accessToChatRoomIndex = roomInfo.room.users.map(function(e) {
+              return e.id;
+            }).indexOf($scope.thisUserId);
+            $scope.map.hasRoomAccess[prefix.hasRoomAccess + roomInfo.room.id] = accessToChatRoomIndex > -1;
             roomInfo.room.messages = roomInfo.messages;
-            _ref = roomInfo.room.messages;
-            for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
-              msg = _ref[_j];
+            _ref1 = roomInfo.room.messages;
+            for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
+              msg = _ref1[_k];
               index = $scope.allUsers.map(function(e) {
                 return e.id;
               }).indexOf(msg.userId);
@@ -157,6 +187,35 @@
             $scope.rooms.push(roomInfo.room);
           }
           $mode.change('list');
+        } else if (newvalue.event === 'ON_WS_OPEN') {
+          if (newvalue.online instanceof Array) {
+            logins = angular.copy(newvalue.online);
+            for (_l = 0, _len3 = logins.length; _l < _len3; _l++) {
+              online = logins[_l];
+              index = $scope.allUsers.map(function(e) {
+                return e.login;
+              }).indexOf(online.field);
+              if (index > -1) {
+                $scope.map.user[prefix.user + $scope.allUsers[index].id].online = true;
+              }
+            }
+          } else {
+            login = angular.copy(newvalue.online);
+            index = $scope.allUsers.map(function(e) {
+              return e.login;
+            }).indexOf(login);
+            if (index > -1) {
+              $scope.map.user[prefix.user + $scope.allUsers[index].id].online = true;
+            }
+          }
+        } else if (newvalue.event === 'ON_WS_CLOSE') {
+          login = angular.copy(newvalue.offline);
+          index = $scope.allUsers.map(function(e) {
+            return e.login;
+          }).indexOf(login);
+          if (index > -1) {
+            $scope.map.user[prefix.user + $scope.allUsers[index].id].online = false;
+          }
         } else if (newvalue.event === 'ADD_ROOM') {
           room = angular.copy(newvalue.room);
           room.messages = [];
@@ -182,6 +241,8 @@
         } else if (newvalue.event === 'ADD_USER') {
           user = angular.copy(newvalue.user);
           $scope.allUsers.push(user);
+          $scope.map.user[prefix.user + u.id] = angular.copy(user);
+          $scope.map.user[prefix.user + u.id].online = false;
           getAvailableUsers();
         } else if (newvalue.event === 'EDIT_USER') {
           user = angular.copy(newvalue.user);
@@ -189,15 +250,16 @@
             return e.id;
           }).indexOf(user.id);
           $scope.allUsers[index].name = user.name;
-          $scope.allUsers[index].online = user.online;
+          $scope.map.user[prefix.user + user.id].name = user.name;
         } else if (newvalue.event === 'REMOVE_USER') {
           index = $scope.allUsers.map(function(e) {
             return e.id;
           }).indexOf(newvalue.userId);
           $scope.allUsers.splice(index, 1);
-          _ref1 = $scope.rooms;
-          for (_k = 0, _len2 = _ref1.length; _k < _len2; _k++) {
-            room = _ref1[_k];
+          $scope.map.user[prefix.user + newvalue.userId] = null;
+          _ref2 = $scope.rooms;
+          for (_m = 0, _len4 = _ref2.length; _m < _len4; _m++) {
+            room = _ref2[_m];
             indexInsideRoom = room.users.map(function(e) {
               return e.id;
             }).indexOf(newvalue.userId);
@@ -214,6 +276,9 @@
             return e.id;
           }).indexOf(newvalue.roomId);
           $scope.rooms[indexRoom].users.push(angular.copy($scope.allUsers[index]));
+          if (newvalue.userId === $scope.thisUserId) {
+            $scope.map.hasRoomAccess[prefix.hasRoomAccess + newvalue.roomId] = true;
+          }
           getAvailableUsers();
         } else if (newvalue.event === 'REMOVE_USER_FROM_ROOM') {
           indexRoom = $scope.rooms.map(function(e) {
@@ -224,6 +289,9 @@
           }).indexOf(newvalue.userId);
           if (indexInsideRoom > -1) {
             $scope.rooms[indexRoom].users.splice(indexInsideRoom, 1);
+          }
+          if (newvalue.userId === $scope.thisUserId) {
+            $scope.map.hasRoomAccess[prefix.hasRoomAccess + newvalue.roomId] = false;
           }
           getAvailableUsers();
         } else if (newvalue.event === 'MESSAGE_ROOM') {
@@ -238,6 +306,13 @@
           $scope.rooms[indexRoom].messages.push(msg);
         }
       }, true);
+      $scope.$watch(function() {
+        return $cookies.get('auth');
+      }, function(newvalue, oldvalue) {
+        if (!newvalue) {
+          return Messages.close();
+        }
+      });
     }
   ]);
 
