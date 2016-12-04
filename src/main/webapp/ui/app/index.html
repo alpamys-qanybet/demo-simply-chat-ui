@@ -31,6 +31,11 @@
             height: 30px;
             background-color: #EEEEEE;
         }
+
+        .chat-content {
+            height: 80vh;
+            overflow-y: auto;
+        }
     </style>
 </head>
 
@@ -62,12 +67,36 @@
 
 <script type='text/javascript' src='lib/bootstrap/js/bootstrap.min.js'></script>
 <script type='text/javascript' src='lib/angular-websocket/angular-websocket.min.js'></script>
+    
+<script type="text/javascript">
+    var cacheTime = (new Date()).getTime();
 
-<script type="text/javascript" src="scripts/app.js"></script>
+    var list = [
+        'app.js',
+        'app.ngminmax.js',
+        'filters/reverse.js',
+        'services/api.js',
+        'services/security.js',
+        'services/auth.js',
+        'services/mode.js',
+        'services/clock.js',
+        'directives/input.text/input.text.js',
+        'directives/online-status/online-status.js',
+        'directives/access-status/access-status.js',
+        'factory/ws.monitoring.js',
+        'controllers/main.js',
+        'controllers/register.js',
+        'controllers/room.js'
+    ];
+
+    for (var i = 0, n = list.length; i < n; i++) {
+        jQuery("body").append("<script type='text/javascript' src='scripts/"+list[i]+"?r="+cacheTime+"'/>");
+    }
+</script>
+<!--script type="text/javascript" src="scripts/app.js"></script>
 <script type="text/javascript" src="scripts/app.ngminmax.js"></script>
 
 <script type="text/javascript" src="scripts/services/api.js"></script>
-<!-- <script type="text/javascript" src="scripts/services/locales.js"></script> -->
 <script type="text/javascript" src="scripts/services/security.js"></script>
 <script type="text/javascript" src="scripts/services/auth.js"></script>
 <script type="text/javascript" src="scripts/services/mode.js"></script>
@@ -78,7 +107,7 @@
 
 <script type="text/javascript" src="scripts/controllers/main.js"></script>
 <script type="text/javascript" src="scripts/controllers/register.js"></script>
-<script type="text/javascript" src="scripts/controllers/room.js"></script>
+<script type="text/javascript" src="scripts/controllers/room.js"></script-->
 
 </body>
 

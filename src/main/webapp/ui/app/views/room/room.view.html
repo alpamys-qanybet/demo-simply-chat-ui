@@ -3,7 +3,7 @@
 	<div class="row" ng-if="$security.hasRole('ADMIN')">
 		<div class="col-sm-4">
 			<a href="#/room" class="btn btn-default" ng-click="$mode.change('list')">back</a>
-			<a href="#/room/view/{{model.room.edit.id}}/users" class="btn btn-info">users</a>
+			<!-- <a href="#/room/view/{{model.room.edit.id}}/users" class="btn btn-info">users</a> -->
 		</div>
 
 		<div class="col-sm-4" ng-class="{'has-error': (form_edit.name.$touched || form_edit.name.$dirty) && form_edit.name.$invalid}">
@@ -34,8 +34,10 @@
 			</div>
 
 		<div class="col-sm-4">
-			<button ng-show="!map.hasRoomAccess['ra'+model.room.edit.id]" class="btn btn-success" ng-click="addUser(thisUserId)">Join group</button>
-			<button ng-show="map.hasRoomAccess['ra'+model.room.edit.id]" class="btn btn-danger" ng-click="removeUser(thisUserId)">Leave group</button>
+			<span access-status map="map" prefix="prefix" 
+				user="thisUserId" room="model.room.edit.id"
+				add="addUser(user,room)" remove="removeUser(user,room)">
+			</span>
 			<button class="btn btn-success" ng-click="edit()" ng-disabled="form_edit.$invalid">edit</button>
 			<button class="btn btn-danger"  ng-click="removeRoom()">delete</button>
 		</div>
@@ -49,45 +51,61 @@
 		<div class="col-sm-4">
 			<span>{{model.room.edit.name}}</span>
 		</div>
-		<div class="col-sm-4">
-			<!-- <a href="#/room/view/{{model.room.edit.id}}/users" class="btn btn-info">users</a> -->
-			<button ng-show="!map.hasRoomAccess['ra'+model.room.edit.id]" class="btn btn-success" ng-click="addUser(thisUserId)">Join group</button>
-			<button ng-show="map.hasRoomAccess['ra'+model.room.edit.id]" class="btn btn-danger" ng-click="removeUser(thisUserId)">Leave group</button>
+		<div class="col-sm-4" access-status map="map" prefix="prefix" 
+			user="thisUserId" room="model.room.edit.id"
+			add="addUser(user,room)" remove="removeUser(user,room)">
 		</div>
 	</div>
 	
-	<div ui-view></div>
-
-	<div ng-show="model.room.edit.available">
-		<div class="row" ng-repeat="msg in model.room.edit.messages">
-			<div class="col-sm-5">
-				<div class="col-sm-3">
-					<span ng-show="map.user['u'+msg.user.id].online"><span class="circle-online">&nbsp;&nbsp;&nbsp;&nbsp;</span></span>
-					<span ng-show="!map.user['u'+msg.user.id].online"><span class="circle-offline">&nbsp;&nbsp;&nbsp;&nbsp;</span></span> {{msg.user.name}}:
-				</div>
+	<!-- chat content -->
+	<div class="col-sm-9" ng-show="map.access[prefix.access+model.room.edit.id]">
+		<div class="chat-content">
+			<div class="row" ng-repeat="msg in model.room.edit.messages | reverse" style="width: 90%;">
+				<div class="col-sm-3" online-status map="map" prefix="prefix" user="msg.user">:</div>
 				<div class="col-sm-9">
 					<p ng-class="{'admin-message': msg.user.admin}">{{msg.content}}</p>
 				</div>
 			</div>
 		</div>
-
 		
-		<form name="form_msg" class="form-ctrl">
-			<div class="row">
-				<div class="col-sm-4">
-					<input-text
-						name="name"
-						validator="form_msg.name"
-						model="model.msg"
-						label="Input message"
-						min="2"
-						max="50">
-					</input-text>
-					<button class="btn btn-success" 
-						ng-click="sendMessage()" 
-						ng-disabled="form_msg.$invalid">Send</button>
+		<div class="row">
+			<form name="form_msg">
+				<div class="col-sm-10" ng-class="{'has-error': form_msg.content.$error.maxlength}">
+					<input type='text' 
+						id="content"
+						name="content" 
+						class="form-control"
+						placeholder="Input message"
+						ng-model="model.msg" 
+						ng-minlength="1" 
+						ng-maxlength="60"
+						aria-describedby="block"
+						required/>
+
+					<span id="block" class="help-block"
+						ng-show="(form_msg.content.$touched || form_msg.content.$dirty) && form_msg.content.$error.maxlength">
+						Exceeded character
+					</span>
 				</div>
-			</div>
-		</form>
+
+				<div class="col-sm-2">
+					<button class="btn btn-success" ng-click="sendMessage()" ng-disabled="form_msg.$invalid">Send</button>
+				</div>
+			</form>
+		</div>
+	</div>
+
+	<!-- user list -->
+	<div class="cols-sm-3">
+		<p ng-repeat="user in model.room.edit.users">
+			<span online-status map="map" prefix="prefix" user="user"></span>
+			<button ng-if="$security.hasRole('ADMIN')" class="btn btn-danger" ng-click="removeUser(user.id, model.room.edit.id)">delete</button>
+		</p>
+
+		<div ng-if="users.length > 0 && $security.hasRole('ADMIN')">
+			<select ng-options="user.id as user.name for user in users" ng-model="model.select.user">
+			</select>
+			<button class="btn btn-info" ng-click="addUser(model.select.user, model.room.edit.id)">add</button>
+		</div>
 	</div>
 </div>

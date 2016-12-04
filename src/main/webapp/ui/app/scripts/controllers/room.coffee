@@ -12,12 +12,12 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 	# 	return
 	$scope.allUsers = []
 
-	prefix =
+	$scope.prefix =
 		user: 'u'
-		hasRoomAccess: 'ra'
+		access: 'ra'
 	$scope.map = # TODO: refactor short access what is available
 		user: []
-		hasRoomAccess: []
+		access: []
 
 	pureModel =
 		room:
@@ -57,12 +57,6 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 			return
 
 		$scope.users = []
-		$scope.model.room.edit.available = false
-		accessToChatRoomIndex = $scope.model.room.edit.users.map (e)->
-			e.id
-		.indexOf $scope.thisUserId
-
-		$scope.model.room.edit.available = accessToChatRoomIndex > -1
 		
 		for user in $scope.allUsers
 			index = $scope.model.room.edit.users.map (e)->
@@ -97,8 +91,6 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 		$rootScope.loading = true
 		$api.room.create plain, (data)->
 			$rootScope.loading = false
-
-			# fetch()
 			$mode.change 'list'
 			return
 		return
@@ -111,8 +103,6 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 		$rootScope.loading = true
 		$api.room.update plain, (data)->
 			$rootScope.loading = false
-			# fetch()
-			# $state.transitionTo 'line'
 			$mode.change 'list'
 			return
 		return
@@ -121,15 +111,15 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 		$scope.model.room.edit = room
 		getAvailableUsers()
 		$mode.change 'view'
-		# fetchRoomUsers room.id
 		return
 
 	$scope.addUser = (userId, roomId)->
-		id = null
-		if roomId
-			id = roomId
-		else
-			id = $scope.model.room.edit.id
+		id = roomId
+		# id = null
+		# if roomId
+		# 	id = roomId
+		# else
+		# 	id = $scope.model.room.edit.id
 		
 		plain =
 			id: userId
@@ -138,16 +128,16 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 		$api.room.users.create id, plain, (data)->
 			$rootScope.loading = false
 			fetchRoomUsers id
-			# $scope.model.room.edit.users.push angular.copy $scope.allUsers[index]
 			return
 		return
 
 	$scope.removeUser = (userId, roomId)->
-		id = null
-		if roomId
-			id = roomId
-		else
-			id = $scope.model.room.edit.id
+		id = roomId
+		# id = null
+		# if roomId
+		# 	id = roomId
+		# else
+		# 	id = $scope.model.room.edit.id
 
 		$rootScope.loading = true
 		$api.room.users.delete id, userId, (data)->
@@ -175,11 +165,10 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 			userId: $cookies.get 'userId'
 
 		$api.room.users.message.send plain, (data)->
+			$scope.model.msg = null
 			$rootScope.loading = false
 			return
 		return
-
-	# fetch()
 
 	$scope.Messages = Messages
 	$scope.$watch  ->
@@ -193,8 +182,8 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 				$scope.allUsers = newvalue.users
 
 				for u in $scope.allUsers
-					$scope.map.user[prefix.user+u.id] = angular.copy u
-					$scope.map.user[prefix.user+u.id].online = false
+					$scope.map.user[$scope.prefix.user+u.id] = angular.copy u
+					$scope.map.user[$scope.prefix.user+u.id].online = false
 
 				rooms = angular.copy newvalue.rooms
 				for roomInfo in rooms
@@ -203,7 +192,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 						e.id
 					.indexOf $scope.thisUserId
 
-					$scope.map.hasRoomAccess[prefix.hasRoomAccess+roomInfo.room.id] = accessToChatRoomIndex > -1
+					$scope.map.access[$scope.prefix.access+roomInfo.room.id] = accessToChatRoomIndex > -1
 				
 					roomInfo.room.messages = roomInfo.messages
 					for msg in roomInfo.room.messages
@@ -226,7 +215,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 						.indexOf online.field
 						
 						if index > -1
-							$scope.map.user[prefix.user+$scope.allUsers[index].id].online = true
+							$scope.map.user[$scope.prefix.user+$scope.allUsers[index].id].online = true
 				else
 					login = angular.copy newvalue.online
 				
@@ -235,7 +224,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 					.indexOf login
 					
 					if index > -1
-						$scope.map.user[prefix.user+$scope.allUsers[index].id].online = true
+						$scope.map.user[$scope.prefix.user+$scope.allUsers[index].id].online = true
 			
 			else if newvalue.event == 'ON_WS_CLOSE'
 				login = angular.copy newvalue.offline
@@ -245,7 +234,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 				.indexOf login
 				
 				if index > -1
-					$scope.map.user[prefix.user+$scope.allUsers[index].id].online = false
+					$scope.map.user[$scope.prefix.user+$scope.allUsers[index].id].online = false
 			
 			else if newvalue.event == 'ADD_ROOM'
 				room = angular.copy newvalue.room
@@ -279,8 +268,8 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 				user = angular.copy newvalue.user
 				$scope.allUsers.push user
 
-				$scope.map.user[prefix.user+u.id] = angular.copy user
-				$scope.map.user[prefix.user+u.id].online = false
+				$scope.map.user[$scope.prefix.user+user.id] = angular.copy user
+				$scope.map.user[$scope.prefix.user+user.id].online = false
 
 				getAvailableUsers()
 
@@ -292,7 +281,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 				.indexOf user.id
 				
 				$scope.allUsers[index].name = user.name
-				$scope.map.user[prefix.user+user.id].name = user.name
+				$scope.map.user[$scope.prefix.user+user.id].name = user.name
 
 			else if newvalue.event == 'REMOVE_USER'
 				index = $scope.allUsers.map (e)->
@@ -300,7 +289,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 				.indexOf newvalue.userId
 
 				$scope.allUsers.splice index, 1
-				$scope.map.user[prefix.user+newvalue.userId] = null # TODO: delete it instead
+				$scope.map.user[$scope.prefix.user+newvalue.userId] = null # TODO: delete it instead
 
 				for room in $scope.rooms
 					indexInsideRoom = room.users.map (e)->
@@ -324,7 +313,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 				$scope.rooms[indexRoom].users.push angular.copy $scope.allUsers[index]
 				
 				if newvalue.userId == $scope.thisUserId
-					$scope.map.hasRoomAccess[prefix.hasRoomAccess+newvalue.roomId] = true
+					$scope.map.access[$scope.prefix.access+newvalue.roomId] = true
 
 				getAvailableUsers()
 
@@ -341,7 +330,7 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 					$scope.rooms[indexRoom].users.splice indexInsideRoom, 1
 
 				if newvalue.userId == $scope.thisUserId
-					$scope.map.hasRoomAccess[prefix.hasRoomAccess+newvalue.roomId] = false
+					$scope.map.access[$scope.prefix.access+newvalue.roomId] = false
 				
 				getAvailableUsers()
 
@@ -370,7 +359,6 @@ angular.module('ibnsina').controller 'RoomCtrl', ['$scope', '$state','$rootScope
 		(newvalue,oldvalue)->
 			if not newvalue
 				Messages.close()
-
 
 	return
 ]
